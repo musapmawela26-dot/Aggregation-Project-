@@ -1,0 +1,226 @@
+  SELECT * FROM dbo.property24 
+--Lesson 10 – Aggregations (COUNT, SUM, AVG, GROUP BY)
+--SECTION 1 – COUNT Aggregations (10 Questions)
+--1. How many total properties are in the database?
+SELECT COUNT(property_id) AS total_properties
+FROM dbo.property24
+--2. How many properties are listed in each province?
+SELECT COUNT(property_id) AS total_properties_per_province,
+       province
+FROM dbo.property24
+GROUP BY province
+--3. How many properties are listed in each city?
+SELECT COUNT(property_id) AS properties_per_city,
+       city
+FROM dbo.property24
+GROUP BY city
+--4. How many properties have more than 2 bedrooms?
+SELECT COUNT(bedrooms) AS number_of_bedrooms
+FROM dbo.property24
+WHERE bedrooms > 2
+--5. How many properties have 2 or more bathrooms?
+SELECT COUNT(*) AS number_of_bathrooms
+FROM dbo.property24
+WHERE bathrooms >= 2
+--6. How many properties have parking for at least 2 cars?
+SELECT COUNT(*) AS parking_lot
+FROM dbo.property24 
+WHERE parking >= 2
+--7. How many properties are priced above R3,000,000?
+SELECT COUNT(property_id) AS property_cost
+FROM dbo.property24 
+WHERE property_price > 3000000
+--8. How many properties are in Gauteng?
+SELECT COUNT(*) AS property_location
+FROM dbo.property24 
+WHERE province = 'gauteng'
+--9. How many properties per province have floor size greater than 200?
+SELECT COUNT(*) AS large_floor_size
+FROM dbo.property24 
+WHERE floor_size > 200
+--10. How many distinct provinces are in the table?
+SELECT COUNT(DISTINCT province) AS number_of_province
+FROM dbo.property24 
+--SECTION 2 – SUM Aggregations (10 Questions)
+--11. What is the total value of all properties combined?
+SELECT SUM(property_price) AS total_value,
+       property_id
+FROM dbo.property24
+GROUP BY property_id
+--12. What is the total property value per province?
+SELECT SUM(property_price) AS total_value_per_province,
+       property_id
+FROM dbo.property24
+GROUP BY property_id
+--13. What is the total property value per city?
+SELECT SUM(CAST(property_price as bigint)) AS total_value_per_city,
+       city
+FROM dbo.property24
+GROUP BY city
+--14. What is the total monthly repayment for all properties?
+SELECT SUM(monthly_repayment) AS total_repayment,
+       property_id
+FROM dbo.property24
+GROUP BY property_id
+--15. What is the total monthly repayment per province?
+SELECT SUM(monthly_repayment) AS total_repayment_per_province,
+       province
+FROM dbo.property24
+GROUP BY province 
+--16. What is the total once-off cost for all properties?
+SELECT SUM(CAST(total_once_off_costs as bigint)) AS total_cost_once_off,
+       property_id
+FROM dbo.property24
+GROUP BY property_id
+--17. What is the total once-off cost per province?
+SELECT SUM(CAST(total_once_off_costs as bigint)) AS total_cost_once_off_per_province,
+       province
+FROM dbo.property24
+GROUP BY province
+       
+--18. What is the total property value for Gauteng?
+SELECT SUM(CAST(property_price as bigint)) AS total_value,
+       province
+FROM dbo.property24
+WHERE province = 'gauteng'
+GROUP BY province 
+--19. What is the total property value for properties priced above R4,000,000?
+SELECT SUM(property_price) AS total_big_ballers,
+       property_id
+FROM dbo.property24
+WHERE property_price > 4000000
+GROUP BY property_id
+--20. What is the total minimum gross monthly income required per province?
+SELECT SUM(min_gross_monthly_income) AS min_gross_per_province,
+       province
+FROM dbo.property24
+GROUP BY province
+--SECTION 3 – AVG Aggregations (10 Questions)
+--21. What is the average property price overall?
+SELECT AVG(property_price) AS avg_price,
+       property_id
+FROM dbo.property24 
+GROUP BY property_id
+--22. What is the average property price per province?
+SELECT AVG(CAST(property_price as bigint)) AS avg_property_price_per_province,
+       province
+FROM dbo.property24
+GROUP BY province
+--23. What is the average property price per city?
+SELECT AVG(CAST(property_price as bigint)) AS avg_property_per_city,
+       city
+FROM dbo.property24
+GROUP BY city
+--24. What is the average number of bedrooms per province?
+SELECT AVG(CAST(bedrooms AS INT)) AS avg_number_of_bedrooms_per_province,
+       province
+FROM dbo.property24
+WHERE bedrooms > 1
+GROUP BY province
+--25. What is the average number of bathrooms per province?
+SELECT AVG(CAST(bathrooms AS INT)) AS avg_number_of_bathrooms,
+       province
+FROM dbo.property24
+WHERE bathrooms > 1
+GROUP BY province
+--26. What is the average floor size per province?
+SELECT AVG(CAST(floor_size AS INT)) AS avg_floor_size,
+       province
+FROM dbo.property24
+WHERE floor_size > 0
+GROUP BY province
+--27. What is the average monthly repayment per province?
+SELECT AVG(CAST(monthly_repayment AS BIGINT)) AS avg_monthly_repayment,
+       province
+FROM dbo.property24
+WHERE monthly_repayment > 1
+GROUP BY province
+--28. What is the average once-off cost per province?
+SELECT AVG(CAST(total_once_off_costs AS BIGINT)) AS avg_once_off_costs,
+       province
+FROM dbo.property24
+WHERE total_once_off_costs >= 1
+GROUP BY province
+--29. What is the average minimum gross monthly income per province?
+SELECT AVG(min_gross_monthly_income) AS avg_min_gross_monthly,
+       province
+FROM dbo.property24
+WHERE min_gross_monthly_income > 1
+GROUP BY province
+--30. What is the average property price for properties above R3,000,000?
+SELECT AVG(CAST(property_price AS BIGINT)) AS avg_property_price,
+       province
+FROM dbo.property24
+WHERE property_price > 3000000
+GROUP BY province
+--SECTION 4 – GROUP BY + Filtering (10 Questions)
+--31. Which province has the highest average property price?
+SELECT TOP 1 province,
+       AVG(CAST(property_price AS BIGINT)) AS highest_avg_property_price
+FROM dbo.property24
+WHERE property_price > 3000000
+GROUP BY province
+ORDER BY highest_avg_property_price DESC
+--32. Which province has the lowest average property price?
+SELECT TOP 1 province,
+       AVG(property_price) AS lowest_avg_property_price
+FROM  dbo.property24
+WHERE property_price < 1000000
+GROUP BY province
+ORDER BY lowest_avg_property_price ASC
+--33. Which city has the highest total property value?
+SELECT TOP 1 city, 
+       SUM(CAST(property_price AS BIGINT)) AS highest_total_property_value
+FROM  dbo.property24
+WHERE property_price > 3000000
+GROUP BY city
+ORDER BY highest_total_property_value DESC
+--34. Which city has the lowest average property price?
+SELECT TOP 1 city,
+       AVG(property_price) AS lowest_avg_property_price
+FROM  dbo.property24
+WHERE property_price < 1000000
+GROUP BY city
+ORDER BY lowest_avg_property_price ASC
+--35. How many properties per province are priced above R2,000,000?
+SELECT COUNT(property_id) AS total_number_of_properties,
+       province
+FROM  dbo.property24
+WHERE property_price > 2000000
+GROUP BY province
+ORDER BY total_number_of_properties DESC
+--36. What is the average floor size per province for properties above R3,000,000?
+SELECT AVG(floor_size) AS avg_floor_size,
+       province
+FROM  dbo.property24
+WHERE property_price > 3000000
+GROUP BY province
+ORDER BY avg_floor_size DESC
+--37. What is the total property value per province for properties with 3 or more bedrooms?
+SELECT SUM(CAST(property_price AS BIGINT)) AS total_property_value,
+       province
+FROM  dbo.property24
+WHERE bedrooms >= 3
+GROUP BY province
+ORDER BY total_property_value DESC
+--38. What is the average monthly repayment per province for properties above R4,000,000?
+SELECT AVG(monthly_repayment) AS avg_monthly_repayment,
+       province
+FROM  dbo.property24
+WHERE property_price > 4000000
+GROUP BY province
+ORDER BY avg_monthly_repayment DESC
+--39. How many properties per city have parking for 2 or more cars?
+SELECT COUNT(property_id) AS total_properties_per_city_with_parking,
+       city
+FROM  dbo.property24
+WHERE parking >= 2
+GROUP BY city
+ORDER BY total_properties_per_city_with_parking DESC
+--40. What is the average minimum gross monthly income per province for properties above R5,000,000?
+SELECT AVG(min_gross_monthly_income) AS avg_min_gross_monthly_income,
+       province
+FROM  dbo.property24
+WHERE property_price > 5000000
+GROUP BY province
+ORDER BY avg_min_gross_monthly_income DESC
